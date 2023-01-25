@@ -1,123 +1,8 @@
-/******************************************************************************
-
-    slight_TLC5957_gsclock_test.ino
-        test of custom high speed clock output
-        for TLC5957 grayscale clock.
-        debugout on usbserial interface: 115200baud
-
-    hardware:
-        Board:
-            Arduino with SAMD51
-            → tested with Adafruit ItsyBitsy M4
-            LED on pin 13
-            osciloscope on gclk_pin = 9
-
-    libraries used:
-        ~ slight_DebugMenu
-
-    written by stefan krueger (s-light),
-        git@s-light.eu, http://s-light.eu, https://github.com/s-light/
-
-******************************************************************************/
-
-#include <slight_DebugMenu.h>
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// Debug Output
-boolean debugOut_LiveSign_Serial_Enabled = 1;
-boolean debugOut_LiveSign_LED_Enabled = 1;
-
-// Menu
-// slight_DebugMenu(Stream &in_ref, Print &out_ref, uint8_t input_length_new);
-slight_DebugMenu myDebugMenu(Serial, Serial, 15);
-
-// TLC5957
-
 uint8_t gclk_pin = 9;
 
-// Main Menu
-void handleMenu_Main(slight_DebugMenu *pInstance) {
-  Print &out = pInstance->get_stream_out_ref();
-  char *command = pInstance->get_command_current_pointer();
-  // out.print("command: '");
-  // out.print(command);
-  // out.println("'");
-  switch (command[0]) {
-    case 'h':
-    case 'H':
-    case '?': {
-        // help
-        out.println(F("____________________________________________________________"));
-        out.println();
-        out.println(F("Help for Commands:"));
-        out.println();
-        out.println(F("\t '?': this help"));
-        out.println(F("\t '!': sketch info"));
-        out.println(F("\t 'y': toggle DebugOut livesign print"));
-        out.println(F("\t 'Y': toggle DebugOut livesign LED"));
-        out.println(F("\t 'x': tests"));
-        out.println();
-        out.println(F("\t 'f': set D9 & D2 frequency in MHz 'f:1.0'"));
-        out.println(F("\t 'r': set D9 period_reg 'r:255'"));
-        out.println(F("\t 'R': set D2 period_reg 'r:255'"));
-        out.println();
-        out.println(F("____________________________________________________________"));
-      } break;
-    case 'y': {
-        out.println(F("\t toggle DebugOut livesign Serial:"));
-        debugOut_LiveSign_Serial_Enabled = !debugOut_LiveSign_Serial_Enabled;
-        out.print(F("\t debugOut_LiveSign_Serial_Enabled:"));
-        out.println(debugOut_LiveSign_Serial_Enabled);
-      } break;
-    case 'Y': {
-        out.println(F("\t toggle DebugOut livesign LED:"));
-        debugOut_LiveSign_LED_Enabled = !debugOut_LiveSign_LED_Enabled;
-        out.print(F("\t debugOut_LiveSign_LED_Enabled:"));
-        out.println(debugOut_LiveSign_LED_Enabled);
-      } break;
-    case 'x': {
-        // get state
-        out.println(F("__________"));
-        out.println(F("Tests:"));
-        out.println(F("nothing to do."));
-        out.println(F("__________"));
-      } break;
-    case 'f': {
-        out.print(F("set frequency - new value:"));
-        float value = atof(&command[1]);
-        out.print(value);
-        value = gsclock_set_frequency_MHz(value);
-        out.print(F(" → "));
-        out.print(value);
-        out.println();
-      } break;
-    case 'r': {
-        out.print(F("set period_reg - new value:"));
-        uint8_t value = atoi(&command[1]);
-        out.print(value);
-        out.println();
-        set_D2_period_reg(value);
-        set_D9_period_reg(value);
-      } break;
-    //---------------------------------------------------------------------
-    default: {
-        if (strlen(command) > 0) {
-          out.print(F("command '"));
-          out.print(command);
-          out.println(F("' not recognized. try again."));
-        }
-        pInstance->get_command_input_pointer()[0] = '?';
-        pInstance->set_flag_EOC(true);
-      }
-  } // end switch
-
-  // end Command Parser
-}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TLC5957
 
 void gsclock_init(Print &out) {
-  out.println(F("init gsclock:")); {
+    out.println(F("init gsclock:")); {
     out.println(F("  init gsclock timer."));
     setup_GenericClock7();
     setup_D9_10MHz();
@@ -354,15 +239,6 @@ float gsclock_get_frequency_MHz() {
         git@s-light.eu, http://s-light.eu, https://github.com/s-light/
 
 ******************************************************************************/
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// Includes
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// use "file.h" for files in same directory as .ino
-// #include "file.h"
-// use <file.h> for files in library directory
-// #include <file.h>
-
 #include <SPI.h>
 #include <slight_TLC5957.h>
 
@@ -372,12 +248,6 @@ float gsclock_get_frequency_MHz() {
 boolean infoled_state = 0;
 const byte infoled_pin = 13;
 
-unsigned long debugOut_LiveSign_TimeStamp_LastAction = 0;
-const uint16_t debugOut_LiveSign_UpdateInterval = 1000; //ms
-
-
-//boolean debugOut_LiveSign_LED_Enabled = 1;
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // TLC5957
 
 // possible options and there defaults:
@@ -508,8 +378,6 @@ void tlc_init(Print &out) {
       }
   out.println(F("\t finished."));
     }
-  }
-}
 
 void pixel_check() {
   if (step >= tlc.pixel_count) {
@@ -626,8 +494,6 @@ void setup() {
   Serial.println();
   gsclock_init(Serial);
   tlc_init(Serial);
-  myDebugMenu.set_callback(handleMenu_Main);
-  myDebugMenu.begin(true);
   Serial.println(F("wait 1s."));
   delay(1000);
   Serial.println(F("Loop:"));
@@ -635,27 +501,4 @@ void setup() {
 
 void loop() {
   update_animation();
-  
-  if (
-    (millis() - debugOut_LiveSign_TimeStamp_LastAction) >
-    debugOut_LiveSign_UpdateInterval
-  ) {
-    debugOut_LiveSign_TimeStamp_LastAction = millis();
-
-    if ( debugOut_LiveSign_Serial_Enabled ) {
-      Serial.print(millis());
-      Serial.println(F("ms;"));
-    }
-
-    if ( debugOut_LiveSign_LED_Enabled ) {
-      infoled_state = ! infoled_state;
-      if (infoled_state) {
-        //set LED to HIGH
-        digitalWrite(infoled_pin, HIGH);
-      } else {
-        //set LED to LOW
-        digitalWrite(infoled_pin, LOW);
-      }
-    }
-  }
 }
