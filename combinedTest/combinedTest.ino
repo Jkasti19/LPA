@@ -408,45 +408,13 @@ void channel_check() {
 }
 
 void staticColor() {
-    int cells = 6*8; //6 LEDS in X Cells (2-UV + 1-Green + 3-RGB)
+    int cells = 96; //6 LEDS in X Cells (2-UV + 1-Green + 3-RGB)
       for (int i = 0 ; i < cells ; i++) {
-//        tlc.set_pixel_16bit_value(4 * i, value_low, value_high, value_low); // green full
-//        tlc.set_pixel_16bit_value(4 * i + 1, value_low, value_high, value_low); // green full
-//        tlc.set_pixel_16bit_value(4 * i + 2, value_low, value_high, value_low); // green full
-//        tlc.set_pixel_16bit_value(4 * i + 3, value_high, value_high, value_high); // green full
+        tlc.set_pixel_16bit_value(4 * i, value_low, value_low, value_high); // green full
+        tlc.set_pixel_16bit_value(4 * i + 1, value_low, value_low, value_high); // green full
+        tlc.set_pixel_16bit_value(4 * i + 2, value_low, value_low, value_high); // green full
+        tlc.set_pixel_16bit_value(4 * i + 3, value_low, value_low, value_high); // green full
       }
-
-//      tlc.set_pixel_16bit_value(4 * (0) + 3, value_low, value_low, value_high);
-//      tlc.set_pixel_16bit_value(4 * (1) + 3, value_low, value_low, value_high);
-//      tlc.set_pixel_16bit_value(4 * (2) + 3, value_low, value_low, value_high);
-//      tlc.set_pixel_16bit_value(4 * (3) + 3, value_low, value_low, value_high);
-//      tlc.set_pixel_16bit_value(4 * (4) + 3, value_low, value_low, value_high);
-//      tlc.set_pixel_16bit_value(4 * (5) + 3, value_low, value_low, value_high);
-
-      tlc.set_pixel_16bit_value(2, value_low, value_low, value_low); // UV-RG Green LED-B
-      tlc.set_pixel_16bit_value(5, value_high, value_low, value_high); // RGB LED
-      
-//      tlc.set_pixel_16bit_value(8, value_high, value_high, value_low);
-//      tlc.set_pixel_16bit_value(11, value_low, value_low, value_high);
-//
-//      tlc.set_pixel_16bit_value(14, value_high, value_high, value_low);
-//      tlc.set_pixel_16bit_value(17, value_low, value_low, value_high);
-//      
-      tlc.set_pixel_16bit_value(20, value_high, value_high, value_low);
-      tlc.set_pixel_16bit_value(23, value_low, value_low, value_low);
-//      
-//      tlc.set_pixel_16bit_value(26, value_high, value_high, value_low);
-//      tlc.set_pixel_16bit_value(29, value_low, value_low, value_high);
-//      
-      tlc.set_pixel_16bit_value(32, value_low, value_low, value_low);
-      tlc.set_pixel_16bit_value(35, value_high, value_low, value_low);
-//
-      tlc.set_pixel_16bit_value(38, value_low, value_low, value_high);
-      tlc.set_pixel_16bit_value(41, value_low, value_low, value_low);
-//      
-      tlc.set_pixel_16bit_value(44, value_low, value_low, value_low);
-      tlc.set_pixel_16bit_value(47, value_low, value_high, value_low);
-
       tlc.show();
 }
 
@@ -460,10 +428,6 @@ void update_animation() {
 //    tlc.set_pixel_all_16bit_value(value_high, value_high, value_high);
 //    tlc.set_pixel_16bit_value(8, value_high, value_high, value_high); 
 //    tlc.show();
-    //pixel_check();
-    //channel_check();
-    //bills_test_pattern_1();
-    //bills_test_pattern_2();
     staticColor();
     
   }
